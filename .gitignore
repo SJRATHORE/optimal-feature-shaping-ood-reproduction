@@ -30,3 +30,6 @@ checkpoints/
 *.log
 runs/
 wandb/
+
+# Extracted feature artifacts
+artifacts/
