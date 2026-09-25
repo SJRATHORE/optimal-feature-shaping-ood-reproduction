@@ -1,157 +1,155 @@
-\# Provenance
+# Provenance
 
+This document records the origin of the major components used in this reproduction project and distinguishes our implementation from ideas and results originating from the original paper.
 
-
-This document records the origin of the major components used in this reproduction project.
-
-
-
-\## Paper
-
+## Paper
 
 **Towards Optimal Feature-Shaping Methods for Out-of-Distribution Detection**
-
-
 Qinyu Zhao et al., ICLR 2024
-
-
 
 Official repository:
 
-
-
 https://github.com/Qinyu-Allen-Zhao/OptFSOOD
 
+The mathematical formulation of optimal feature shaping, Interval-Specific Feature Impact (ISFI), percentile-based feature intervals, and the closed-form ID-only optimization originate from the paper.
 
+---
 
-The mathematical formulation of optimal feature shaping, Interval-Specific Feature Impact (ISFI), percentile-based feature intervals, and the closed-form ID-only solution are derived from the paper.
-
-
-
-\---
-
-
-
-\## Component Provenance
-
-
+## Component Provenance
 
 | Component | Status | Source / Notes |
-
 |---|---|---|
-
 | CIFAR-10 and SVHN data pipeline | Written by us | Implemented using `torchvision.datasets` and torchvision transforms |
+| CIFAR-10 preprocessing | Written by us | Training augmentation and normalization implemented for this reproduction |
+| ResNet-18 backbone | Adapted by us | Based on `torchvision.models.resnet18` |
+| CIFAR ResNet first convolution | Adapted by us | Changed to 3x3, stride 1, padding 1 for 32x32 images |
+| Initial max-pooling removal | Adapted by us | Standard ResNet max-pool replaced with an identity operation |
+| Training pipeline | Written by us | SGD training, cosine annealing, checkpointing and evaluation |
+| Per-epoch logging | Written by us | Train/test loss, accuracy and learning rate saved to `results/training_log.csv` |
+| Penultimate feature extraction | Written by us | Extracts the 512-dimensional ResNet-18 representation |
+| 0.1 / 99.9 percentile feature limits | Adapted from Zhao et al. | Hyperparameter choice follows the paper |
+| K = 100 feature intervals | Adapted from Zhao et al. | Interval count follows the paper |
+| Interval-Specific Feature Impact (ISFI) | Adapted from Zhao et al. | Implemented from the mathematical formulation described in the paper |
+| ID-only optimal theta calculation | Adapted from Zhao et al. | Implements Equation 14 |
+| Feature reshaping at inference | Adapted from Zhao et al. | Features are rescaled according to their learned interval-specific theta values |
+| MSP scoring | Written by us | Maximum softmax probability |
+| MLS scoring | Written by us | Maximum model logit |
+| Energy scoring | Written by us | Log-sum-exp of classifier logits |
+| AUROC evaluation | Written by us | Computed using scikit-learn |
+| FPR95 evaluation | Written by us | Uses a threshold corresponding to 95% ID true-positive rate |
+| Result plotting | Written by us | Matplotlib plots generated from saved CSV results |
+| ResNet-18 / CIFAR-10 / SVHN experiment | Our adaptation | Compute-feasible experiment differing from the paper's exact benchmark |
 
-| CIFAR-10 preprocessing | Written by us | Standard CIFAR normalization with random crop and horizontal flip for training |
+---
 
-| ResNet-18 backbone | Adapted | Based on `torchvision.models.resnet18`; modified for 32x32 CIFAR images |
-
-| First convolution modification | Adapted by us | Changed to 3x3 convolution, stride 1, padding 1 |
-
-| Initial max pooling removal | Adapted by us | Replaced standard ResNet max-pool with identity operation |
-
-| Training pipeline | Written by us | SGD training, cosine annealing scheduler, checkpointing, evaluation and CSV logging |
-
-| Per-epoch experiment logging | Written by us | Training/test loss, training/test accuracy and learning rate stored in `results/training\_log.csv` |
-
-| Penultimate feature extraction | Written by us | Extracts the 512-dimensional ResNet-18 representation from all CIFAR-10 training samples |
-
-| Feature-value percentile limits | Adapted from Zhao et al. | Uses the paper's 0.1 and 99.9 percentile limits |
-
-| Number of feature intervals | Adapted from Zhao et al. | Uses K = 100 as specified in the paper |
-
-| Interval-Specific Feature Impact (ISFI) | Adapted from Zhao et al. | Implementation follows the feature-impact formulation described in the paper |
-
-| ID-only optimal theta calculation | Adapted from Zhao et al. | Implements the closed-form solution from Equation 14 |
-
-| Feature reshaping at inference | Adapted from Zhao et al. | Features are rescaled according to their learned interval-specific theta value |
-
-| MSP scoring | Written by us | Computed from the maximum softmax probability |
-
-| MLS scoring | Written by us | Computed from the maximum model logit |
-
-| Energy scoring | Written by us | Computed using log-sum-exp over logits |
-
-| AUROC evaluation | Written by us | Calculated using scikit-learn with ID samples treated as the positive class |
-
-| FPR95 evaluation | Written by us | Threshold chosen to accept 95% of ID samples, then OOD false-positive rate is measured |
-
-| Result plotting | Written by us | Matplotlib plots generated from the saved CSV experiment logs |
-
-| ResNet-18 / CIFAR-10 / SVHN experiment | Our adaptation | Compute-feasible reproduction setup; not the exact architecture or full OOD benchmark used in the paper |
-
-
-
-\---
-
-
-
-\## Use of the Official Repository
-
-
+## Use of the Official Repository
 
 The official OptFSOOD repository was identified as a reference for the original work.
 
+No source files from the official repository were copied directly into this project.
 
+The feature-shaping implementation in this repository was written specifically for this reproduction using the mathematical description in the paper.
 
-No official repository source files were copied directly into this project.
+---
 
+## Our Results
 
+The following results were obtained by our team and are not results reported by the original authors.
 
-The feature-shaping implementation in this repository was written specifically for this reproduction based on the mathematical method described in the paper.
+### CIFAR-10 Classification
 
+Best ResNet-18 test accuracy:
 
+```text
+94.42%
+```
 
-\---
+### CIFAR-10 vs SVHN OOD Detection
 
+| Method | AUROC | FPR95 |
+|---|---:|---:|
+| MSP | 91.97% | 59.68% |
+| MLS | 92.16% | 47.15% |
+| Energy | 92.11% | 47.91% |
+| Optimal Shaping (MLS) | 88.42% | 59.08% |
+| Optimal Shaping (Energy) | 88.28% | 59.99% |
 
+These values were generated by our ResNet-18 reproduction and should not be presented as results from Zhao et al.
 
-\## Differences From the Original Experimental Setup
+---
 
+## Original Paper Results
 
+Values shown in the README under the comparison with the paper are taken from the original paper's CIFAR-10 benchmark.
 
-The reproduction intentionally differs from the complete experimental setup in the paper.
+The paper evaluates different architectures and averages results across multiple OOD datasets.
 
+Our ResNet-18 / SVHN results are therefore not directly comparable to the paper's reported averages.
 
+---
+
+## Differences From the Original Experimental Setup
+
+Our reproduction intentionally differs from the complete experimental setup used in the paper.
 
 Our experiment uses:
 
+- ResNet-18 trained from scratch
+- CIFAR-10 as the in-distribution dataset
+- SVHN as the out-of-distribution dataset
+- One primary OOD dataset
+- A 512-dimensional ResNet-18 penultimate feature representation
 
+The original paper evaluates CIFAR-10 using architectures including DenseNet101, ViT-B-16, and MLP-Mixer-Nano and evaluates multiple OOD datasets.
 
-\- ResNet-18 trained from scratch
+Therefore, this project is an **adapted reproduction of the core method**, not an exact replication of every experiment reported in the paper.
 
-\- CIFAR-10 as the in-distribution dataset
+---
 
-\- SVHN as the out-of-distribution dataset
+## Generated Artifacts
 
-\- A single OOD dataset for the primary reproduction experiment
-
-
-
-The paper evaluates different CIFAR architectures and reports results across multiple OOD datasets.
-
-
-
-Therefore, this repository should be considered an adapted reproduction of the core method rather than an exact replication of every result reported in the paper.
-
-
-
-\---
-
-
-
-\## Generated Artifacts
-
-
-
-The following files are generated locally and are intentionally excluded from Git:
-
-
+The following generated files are intentionally excluded from Git:
 
 ```text
-
 data/
-
 checkpoints/
-
 artifacts/
+.venv/
+```
+
+These contain:
+
+- Downloaded datasets
+- Trained model checkpoints
+- Extracted CIFAR-10 feature tensors
+- Learned feature-shaping parameters
+- Local Python environment files
+
+---
+
+## Preserved Experimental Evidence
+
+The following experiment outputs are committed to the repository:
+
+```text
+results/training_log.csv
+results/ood_results.csv
+results/training_accuracy.png
+results/training_loss.png
+results/ood_auroc.png
+results/ood_fpr95.png
+```
+
+These files preserve the training history and final reproduction results used in the README and report.
+
+---
+
+## Summary of Attribution
+
+**Original paper:** mathematical feature-shaping method, ISFI formulation, percentile limits, K = 100 setup, and closed-form ID-only optimization.
+
+**Torchvision:** base ResNet-18 architecture and dataset utilities.
+
+**Our team:** CIFAR-specific ResNet-18 adaptation, training pipeline, logging, feature extraction, implementation of the paper's equations, evaluation pipeline, plots, and ResNet-18 / CIFAR-10 / SVHN experiment.
+
+No original-paper results are presented as results obtained by our team.
