@@ -153,3 +153,20 @@ These files preserve the training history and final reproduction results used in
 **Our team:** CIFAR-specific ResNet-18 adaptation, training pipeline, logging, feature extraction, implementation of the paper's equations, evaluation pipeline, plots, and ResNet-18 / CIFAR-10 / SVHN experiment.
 
 No original-paper results are presented as results obtained by our team.
+
+## Deployment
+
+The deployment layer was implemented specifically for this reproduction project.
+
+Project-specific deployment components include:
+
+- FastAPI inference API
+- Browser-based image upload interface
+- CIFAR-10 and SVHN example image catalog
+- Image preprocessing for uploaded files
+- Optimal Feature Shaping inference
+- Energy-based ID/OOD decision
+- CIFAR-10 training-score threshold calibration
+- Visualization of the OOD score relative to the calibrated threshold
+
+The deployment uses the reproduced ResNet-18 model and learned feature-shaping parameters described elsewhere in this repository.

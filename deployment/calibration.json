@@ -1,0 +1,7 @@
+{
+  "method": "Optimal Shaping (Energy)",
+  "threshold": 10.585031509399414,
+  "calibration_dataset": "CIFAR-10 training set",
+  "id_acceptance_target": 0.95,
+  "num_calibration_samples": 50000
+}

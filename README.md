@@ -491,3 +491,30 @@ ICLR 2024.
 Official implementation:
 
 https://github.com/Qinyu-Allen-Zhao/OptFSOOD
+
+---
+
+## 17. Deployment
+
+The reproduced OOD detector is deployed locally using FastAPI.
+
+The deployment provides:
+
+- A browser-based dark UI for image upload and prediction
+- CIFAR-10 and SVHN quick example catalogs
+- CIFAR-10 class prediction
+- Classifier confidence
+- Optimal Feature Shaping OOD score
+- ID/OOD decision based on a calibrated threshold
+- Interactive REST API documentation through FastAPI Swagger UI
+
+### OOD Threshold Calibration
+
+The deployment threshold is calibrated using the CIFAR-10 training features.
+
+Using Optimal Feature Shaping with the Energy score, the threshold is chosen as the 5th percentile of the in-distribution training scores so that approximately 95% of CIFAR-10 training samples are accepted as ID.
+
+The calibrated threshold used by the deployment is:
+
+```text
+10.585032
